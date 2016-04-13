@@ -18,6 +18,8 @@ var {
 
 var moment = require('moment');
 
+moment.locale('id');
+
 var Button = require('react-native-button');
 
 var GiftedMessenger = React.createClass({
@@ -95,6 +97,10 @@ var GiftedMessenger = React.createClass({
   },
 
   getInitialState: function() {
+    if (this.props.moment) {
+      moment = this.props.moment
+    }
+
     this._data = [];
     this._rowIds = [];
 
@@ -283,16 +289,21 @@ var GiftedMessenger = React.createClass({
 
   onKeyboardWillShow(e) {
     Animated.timing(this.state.height, {
-      toValue: this.listViewMaxHeight - (e.endCoordinates ? e.endCoordinates.height : e.end.height),
+      toValue: this.listViewMaxHeight - (e.endCoordinates ? e.endCoordinates.height : e.end.height) + 150 + 10,
       duration: 200,
-    }).start();
+    }).start(()=>{
+      setTimeout(()=>{
+        this.scrollToBottom();
+      }, 200);
+    });
   },
 
   onKeyboardDidShow(e) {
     if(React.Platform.OS == 'android') {
       this.onKeyboardWillShow(e);
+    } else {
+      this.scrollToBottom();
     }
-    this.scrollToBottom();
   },
   onKeyboardDidHide(e) {
     if(React.Platform.OS == 'android') {
@@ -508,7 +519,7 @@ var GiftedMessenger = React.createClass({
           keyboardDismissMode={this.props.keyboardDismissMode}
 
 
-          initialListSize={10}
+          initialListSize={1000}
           pageSize={this.props.messages.length}
 
 
@@ -542,9 +553,7 @@ var GiftedMessenger = React.createClass({
             onChangeText={this.onChangeText}
             value={this.state.text}
             autoFocus={this.props.autoFocus}
-            returnKeyType={this.props.submitOnReturn ? 'send' : 'default'}
-            onSubmitEditing={this.props.submitOnReturn ? this.onSend : null}
-            enablesReturnKeyAutomatically={true}
+            multiline={true}
 
             blurOnSubmit={false}
           />
@@ -566,13 +575,13 @@ var GiftedMessenger = React.createClass({
     this.styles = {
       container: {
         flex: 1,
-        backgroundColor: '#FFF',
+        backgroundColor: '#FFF'
       },
       listView: {
         flex: 1,
       },
       textInputContainer: {
-        height: 44,
+        height: 60,
         borderTopWidth: 1 / PixelRatio.get(),
         borderColor: '#b2b2b2',
         flexDirection: 'row',
@@ -581,11 +590,12 @@ var GiftedMessenger = React.createClass({
       },
       textInput: {
         alignSelf: 'center',
-        height: 30,
+        height: 50,
         width: 100,
         backgroundColor: '#FFF',
         flex: 1,
-        padding: 0,
+        paddingTop: 0,
+        paddingBottom: 10,
         margin: 0,
         fontSize: 15,
       },
