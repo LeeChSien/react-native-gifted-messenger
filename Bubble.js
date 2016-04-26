@@ -56,7 +56,19 @@ export default class Bubble extends React.Component {
 
   render(){
     var flexStyle = {};
-    if ( this.props.text.length > 40 ) {
+
+    var actualLength = 0
+    for (var i = 0; i < this.props.text.length; i++) {
+      if(this.props.text.charCodeAt(i) >= 0x4E00 && this.props.text.charCodeAt(i) <= 0x9FA5) {
+        actualLength += 2;
+      } else if (this.props.text[i] == "\n") {
+        actualLength -= 20;
+      } else {
+        actualLength += 1;
+      }
+    }
+
+    if ( actualLength > 40) {
      flexStyle.flex = 1;
     }
 
